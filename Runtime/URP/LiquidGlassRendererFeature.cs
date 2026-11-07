@@ -30,6 +30,7 @@ namespace Balu.LiquidGlass.URP
 
         public override void Create()
         {
+            pass?.Dispose();
             if (!settings.blurShader)
             {
                 var bundledBlur = Resources.Load<Material>("LiquidGlassBlurURP");
@@ -40,8 +41,10 @@ namespace Balu.LiquidGlass.URP
 
         public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
         {
+#if !LIQUIDGLASS_URP17
             if (pass != null)
                 pass.Setup(renderer.cameraColorTargetHandle, renderingData.cameraData.cameraTargetDescriptor);
+#endif
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
