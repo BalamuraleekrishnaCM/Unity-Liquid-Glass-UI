@@ -53,6 +53,7 @@ Shader "Balu/LiquidGlass/UI"
 
             sampler2D _MainTex;
             sampler2D _LiquidGlassBackground;
+            float4 _LiquidGlassBackground_TexelSize;
             fixed4 _Color;
             fixed4 _GlassTint;
             float _GlassIntensity, _BlurRadius, _Refraction, _Frost, _RimStrength;
@@ -94,7 +95,12 @@ Shader "Balu/LiquidGlass/UI"
                 float2 warp = centered * _Refraction * (0.25 + _GlassIntensity);
                 float2 sampleUV = saturate(screenUV + warp);
 
-                fixed3 backdrop = tex2D(_LiquidGlassBackground, sampleUV).rgb;
+                float2 blurStep = _LiquidGlassBackground_TexelSize.xy * max(_BlurRadius, 0.0);
+                fixed3 backdrop = tex2D(_LiquidGlassBackground, sampleUV).rgb * 0.40;
+                backdrop += tex2D(_LiquidGlassBackground, sampleUV + float2(blurStep.x, 0)).rgb * 0.15;
+                backdrop += tex2D(_LiquidGlassBackground, sampleUV - float2(blurStep.x, 0)).rgb * 0.15;
+                backdrop += tex2D(_LiquidGlassBackground, sampleUV + float2(0, blurStep.y)).rgb * 0.15;
+                backdrop += tex2D(_LiquidGlassBackground, sampleUV - float2(0, blurStep.y)).rgb * 0.15;
                 fixed3 glass = lerp(_GlassTint.rgb, backdrop, saturate(_LiquidGlassBackgroundAvailable * _GlassIntensity));
                 glass = lerp(glass, _GlassTint.rgb, _Frost * 0.45);
 
