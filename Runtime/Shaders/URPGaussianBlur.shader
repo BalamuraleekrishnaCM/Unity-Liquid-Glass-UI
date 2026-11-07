@@ -1,5 +1,6 @@
 Shader "Hidden/Balu/LiquidGlass/URPGaussianBlur"
 {
+    Properties { _BlurRadius ("Blur Radius", Float) = 3 }
     SubShader
     {
         Tags { "RenderPipeline"="UniversalPipeline" }
