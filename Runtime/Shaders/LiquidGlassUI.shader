@@ -10,8 +10,6 @@ Shader "Balu/LiquidGlass/UI"
         _Refraction ("Refraction", Range(0,0.08)) = 0.012
         _Frost ("Frost", Range(0,1)) = 0.12
         _RimStrength ("Rim Strength", Range(0,2)) = 0.55
-        _LiquidGlassBackground ("Backdrop", 2D) = "black" {}
-        _LiquidGlassBackgroundAvailable ("Backdrop Available", Float) = 0
         _StencilComp ("Stencil Comparison", Float) = 8
         _Stencil ("Stencil ID", Float) = 0
         _StencilOp ("Stencil Operation", Float) = 0
