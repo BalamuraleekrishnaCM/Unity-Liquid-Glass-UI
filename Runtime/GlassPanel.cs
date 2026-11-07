@@ -19,7 +19,7 @@ namespace Balu.LiquidGlass
         {
             if (!image) image = GetComponent<Image>();
             if (!image) return;
-            image.color = tint;
+            image.color = Color.white;
             var glass = GetComponent<GlassGraphic>();
             if (!glass) glass = gameObject.AddComponent<GlassGraphic>();
             glass.Tint = tint;
