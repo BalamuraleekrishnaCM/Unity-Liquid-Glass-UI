@@ -38,6 +38,7 @@ Shader "Hidden/Balu/LiquidGlass/URPGaussianBlur"
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment FragHorizontal
+            #pragma multi_compile_instancing
             ENDHLSL
         }
         Pass
@@ -46,6 +47,7 @@ Shader "Hidden/Balu/LiquidGlass/URPGaussianBlur"
             HLSLPROGRAM
             #pragma vertex Vert
             #pragma fragment FragVertical
+            #pragma multi_compile_instancing
             ENDHLSL
         }
     }
