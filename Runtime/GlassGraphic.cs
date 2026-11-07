@@ -27,6 +27,7 @@ namespace Balu.LiquidGlass
         private static readonly int RefractionId = Shader.PropertyToID("_Refraction");
         private static readonly int FrostId = Shader.PropertyToID("_Frost");
         private static readonly int RimId = Shader.PropertyToID("_RimStrength");
+        private static readonly int GlassRectId = Shader.PropertyToID("_GlassRect");
 
         public Color Tint { get => tint; set { tint = value; Apply(); } }
         public float Intensity { get => intensity; set { intensity = Mathf.Clamp01(value); Apply(); } }
@@ -98,10 +99,17 @@ namespace Balu.LiquidGlass
             if (runtimeMaterial.HasProperty(RefractionId)) runtimeMaterial.SetFloat(RefractionId, refraction);
             if (runtimeMaterial.HasProperty(FrostId)) runtimeMaterial.SetFloat(FrostId, frost);
             if (runtimeMaterial.HasProperty(RimId)) runtimeMaterial.SetFloat(RimId, rimStrength);
+            if (runtimeMaterial.HasProperty(GlassRectId))
+            {
+                Rect rect = target.rectTransform.rect;
+                runtimeMaterial.SetVector(GlassRectId, new Vector4(rect.xMin, rect.yMin, rect.width, rect.height));
+            }
 
             target.material = runtimeMaterial;
             target.color = Color.white;
         }
+
+        private void OnRectTransformDimensionsChange() { if (isActiveAndEnabled) Apply(); }
 
         private void Cache()
         {
