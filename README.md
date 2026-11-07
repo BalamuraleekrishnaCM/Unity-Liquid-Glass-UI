@@ -2,6 +2,19 @@
 
 A Unity Package Manager package for Liquid Glass-style uGUI and TextMeshPro interfaces.
 
+## Screenshots & showcase
+
+The following artwork illustrates the visual direction and feature areas of the package. **These are concept illustrations, not captures from a running Unity Editor or runtime build.** Replace them with real project screenshots when available.
+
+### Main Liquid Glass UI
+![Liquid Glass UI showcase](Screenshots/liquid-glass-showcase.svg)
+
+### Interactive controls
+![Liquid Glass controls](Screenshots/liquid-glass-controls.svg)
+
+### XR / World Space UI
+![Liquid Glass XR concept](Screenshots/liquid-glass-xr.svg)
+
 ## Install from Git
 
 **Window → Package Manager → + → Add package from git URL…**
