@@ -42,7 +42,7 @@ namespace Balu.LiquidGlass.URP
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            if (pass == null || !settings.blurShader || !renderingData.cameraData.postProcessEnabled && renderingData.cameraData.isSceneViewCamera)
+            if (pass == null || !settings.blurShader || renderingData.cameraData.cameraType == CameraType.Preview)
                 return;
             pass.renderPassEvent = settings.injectionPoint;
             renderer.EnqueuePass(pass);
@@ -69,6 +69,7 @@ namespace Balu.LiquidGlass.URP
             public LiquidGlassBlurPass(FeatureSettings settings)
             {
                 this.settings = settings;
+                ConfigureInput(ScriptableRenderPassInput.Color);
                 if (settings.blurShader) material = CoreUtils.CreateEngineMaterial(settings.blurShader);
             }
 
