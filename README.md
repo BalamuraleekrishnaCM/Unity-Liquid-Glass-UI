@@ -80,7 +80,7 @@ Add **Glass Pointer Feedback** to a control to animate its glass intensity on po
 
 ## Rendering model and limitations
 
-The shader provides a blurred backdrop sample, glass tint, frost, rim highlight and subtle screen-space refraction. It is a stylized real-time UI effect, not a physically based optical simulation. Blur is captured once per camera frame and shared by glass surfaces; per-surface blur radius adds a small local sample blur.
+The shader provides a blurred backdrop sample, glass tint, frost, rim highlight, subtle screen-space refraction, rounded-rectangle clipping and soft edge controls. It is a stylized real-time UI effect, not a physically based optical simulation. Blur is captured once per camera frame and shared by glass surfaces; per-surface blur radius adds a small local sample blur.
 
 ## Validation status
 
