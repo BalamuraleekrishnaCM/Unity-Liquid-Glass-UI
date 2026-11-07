@@ -10,6 +10,7 @@ Shader "Balu/LiquidGlass/UI"
         _Refraction ("Refraction", Range(0,0.08)) = 0.012
         _Frost ("Frost", Range(0,1)) = 0.12
         _RimStrength ("Rim Strength", Range(0,2)) = 0.55
+        [HideInInspector] _GlassRect ("Glass Rect", Vector) = (0,0,100,100)
         _StencilComp ("Stencil Comparison", Float) = 8
         _Stencil ("Stencil ID", Float) = 0
         _StencilOp ("Stencil Operation", Float) = 0
@@ -56,6 +57,7 @@ Shader "Balu/LiquidGlass/UI"
             fixed4 _GlassTint;
             float _GlassIntensity, _BlurRadius, _Refraction, _Frost, _RimStrength;
             float _LiquidGlassBackgroundAvailable;
+            float4 _GlassRect;
             float4 _MainTex_ST;
             float4 _ClipRect;
 
@@ -73,6 +75,7 @@ Shader "Balu/LiquidGlass/UI"
                 float2 uv : TEXCOORD0;
                 float4 worldPosition : TEXCOORD1;
                 float4 screenPos : TEXCOORD2;
+                float2 localPosition : TEXCOORD3;
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
@@ -84,6 +87,7 @@ Shader "Balu/LiquidGlass/UI"
                 o.worldPosition = v.vertex;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.screenPos = ComputeScreenPos(o.vertex);
+                o.localPosition = v.vertex.xy;
                 o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
                 o.color = v.color * _Color;
                 return o;
@@ -94,7 +98,8 @@ Shader "Balu/LiquidGlass/UI"
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
                 fixed4 sprite = tex2D(_MainTex, i.uv) * i.color;
                 float2 screenUV = i.screenPos.xy / max(i.screenPos.w, 0.0001);
-                float2 centered = i.uv - 0.5;
+                float2 localUV = saturate((i.localPosition - _GlassRect.xy) / max(_GlassRect.zw, float2(0.001, 0.001)));
+                float2 centered = localUV - 0.5;
                 float2 warp = centered * _Refraction * (0.25 + _GlassIntensity);
                 float2 sampleUV = saturate(screenUV + warp);
 
@@ -107,7 +112,7 @@ Shader "Balu/LiquidGlass/UI"
                 fixed3 glass = lerp(_GlassTint.rgb, backdrop, saturate(_LiquidGlassBackgroundAvailable * _GlassIntensity));
                 glass = lerp(glass, _GlassTint.rgb, _Frost * 0.45);
 
-                float edge = min(min(i.uv.x, 1.0 - i.uv.x), min(i.uv.y, 1.0 - i.uv.y));
+                float edge = min(min(localUV.x, 1.0 - localUV.x), min(localUV.y, 1.0 - localUV.y));
                 float rim = (1.0 - smoothstep(0.0, 0.055, edge)) * _RimStrength;
                 glass += rim * 0.18;
                 glass = lerp(_GlassTint.rgb, glass, saturate(_GlassIntensity + 0.2));
