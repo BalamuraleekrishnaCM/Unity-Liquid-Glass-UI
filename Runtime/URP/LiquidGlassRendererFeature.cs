@@ -61,6 +61,8 @@ namespace Balu.LiquidGlass.URP
             private RTHandle blurA;
             private RTHandle blurB;
             private Material material;
+            private Vector4 textureSize;
+            private static readonly int TexelSizeId = Shader.PropertyToID("_LiquidGlassBackground_TexelSize");
             private static readonly int AvailableId = Shader.PropertyToID("_LiquidGlassBackgroundAvailable");
             private static readonly int TextureId = Shader.PropertyToID("_LiquidGlassBackground");
 
@@ -79,6 +81,7 @@ namespace Balu.LiquidGlass.URP
                 descriptor.height = Mathf.Max(16, Mathf.RoundToInt(descriptor.height * settings.resolutionScale));
                 RenderingUtils.ReAllocateIfNeeded(ref blurA, descriptor, FilterMode.Bilinear, TextureWrapMode.Clamp, name: "_LiquidGlassBlurA");
                 RenderingUtils.ReAllocateIfNeeded(ref blurB, descriptor, FilterMode.Bilinear, TextureWrapMode.Clamp, name: "_LiquidGlassBlurB");
+                textureSize = new Vector4(1f / descriptor.width, 1f / descriptor.height, descriptor.width, descriptor.height);
             }
 
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -89,6 +92,7 @@ namespace Balu.LiquidGlass.URP
                 Blitter.BlitCameraTexture(cmd, source, blurA, material, 0);
                 Blitter.BlitCameraTexture(cmd, blurA, blurB, material, 1);
                 cmd.SetGlobalTexture(TextureId, blurB.nameID);
+                cmd.SetGlobalVector(TexelSizeId, textureSize);
                 cmd.SetGlobalFloat(AvailableId, 1f);
                 context.ExecuteCommandBuffer(cmd);
                 CommandBufferPool.Release(cmd);
