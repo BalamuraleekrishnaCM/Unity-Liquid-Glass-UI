@@ -10,6 +10,10 @@ A Unity Package Manager package for Liquid Glass-style uGUI and TextMeshPro inte
 
 Package ID: `com.balu.unity-liquid-glass`
 
+## TextMeshPro setup
+
+Install the TextMeshPro package dependency, then import **Window → TextMeshPro → Import TMP Essential Resources** in the Unity project so generated TMP labels have a default font asset.
+
 ## Create UI from Hierarchy
 
 Use **GameObject → UI → Liquid Glass**:
@@ -29,7 +33,13 @@ Generated objects use native uGUI/TMP components and preserve Unity's standard i
 3. Adjust resolution scale and blur radius on the component.
 4. Add Liquid Glass UI elements to a Canvas rendered after the camera.
 
-### Universal Render Pipeline (URP 14+)
+### Universal Render Pipeline
+
+**Unity 2022.3 / URP 14:** the package uses the compatibility ScriptableRenderPass path. Add the feature to the active Universal Renderer Data asset and ensure the renderer uses an intermediate color target when required.
+
+**Unity 6 / URP 17+:** the package uses the native RenderGraph path by default; no Compatibility Mode switch is required. The pass derives its temporary texture descriptors from the active camera color texture and publishes the blurred texture as a global shader input.
+
+For either version:
 1. Open the active Universal Renderer Data asset.
 2. Select **Add Renderer Feature → Liquid Glass Renderer Feature**.
 3. Set the injection point to **Before Rendering Transparents**.
@@ -39,7 +49,7 @@ URP integration is isolated in an optional assembly and does not add URP as a ma
 
 ## Presets and interaction feedback
 
-Create reusable presets with **Assets → Create → Liquid Glass → Glass Preset**. Assign a preset from code:
+Create reusable presets with **Assets → Create → Liquid Glass → Glass Preset**. Assign a preset directly in the GlassGraphic Inspector, or from code:
 
 ```csharp
 using Balu.LiquidGlass;
