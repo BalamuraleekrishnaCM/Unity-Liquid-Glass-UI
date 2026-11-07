@@ -8,9 +8,6 @@ In Unity, open **Window → Package Manager → + → Add package from git URL�
 
 `https://github.com/BalamuraleekrishnaCM/Unity-Liquid-Glass-UI.git`
 
-For a pinned release:
-
-`https://github.com/BalamuraleekrishnaCM/Unity-Liquid-Glass-UI.git#v2.0.0`
 
 ## Hierarchy menu
 
