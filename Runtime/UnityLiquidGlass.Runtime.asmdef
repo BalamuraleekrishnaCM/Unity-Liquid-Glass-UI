@@ -1,0 +1,6 @@
+{
+  "name": "UnityLiquidGlass.Runtime",
+  "rootNamespace": "Balu.LiquidGlass",
+  "references": ["Unity.TextMeshPro", "UnityEngine.UI"],
+  "autoReferenced": true
+}
