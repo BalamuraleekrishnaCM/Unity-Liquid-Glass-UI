@@ -14,7 +14,7 @@ Package ID: `com.balu.unity-liquid-glass`
 
 Use **GameObject → UI → Liquid Glass**:
 
-- Glass Canvas, Panel, Image, Raw Image
+- Glass Canvas, World Space Canvas (XR), Panel, Image, Raw Image
 - Button (TMP), Text (TMP), Input Field (TMP), Dropdown (TMP)
 - Toggle, Slider, Scroll View, Scrollbar
 - Button (Legacy), Text (Legacy), Input Field (Legacy), Dropdown (Legacy)
