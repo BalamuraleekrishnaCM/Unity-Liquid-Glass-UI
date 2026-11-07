@@ -43,7 +43,7 @@ Shader "Balu/LiquidGlass/UI"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma target 2.0
+            #pragma target 3.5
             #pragma multi_compile_local _ UNITY_UI_CLIP_RECT
             #pragma multi_compile_local _ UNITY_UI_ALPHACLIP
             #include "UnityCG.cginc"
@@ -64,6 +64,7 @@ Shader "Balu/LiquidGlass/UI"
                 float4 vertex : POSITION;
                 float4 color : COLOR;
                 float2 texcoord : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
             struct v2f
             {
@@ -77,6 +78,7 @@ Shader "Balu/LiquidGlass/UI"
 
             v2f vert(appdata_t v)
             {
+                UNITY_SETUP_INSTANCE_ID(v);
                 v2f o;
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 o.worldPosition = v.vertex;
