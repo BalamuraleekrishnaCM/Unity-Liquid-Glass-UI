@@ -153,7 +153,7 @@ namespace Balu.LiquidGlass.URP
                     builder.UseTexture(blurTextureB, AccessFlags.Read);
                     builder.SetGlobalTextureAfterPass(blurTextureB, TextureId);
                     builder.AllowGlobalStateModification(true);
-                    builder.SetRenderFunc(static (GlobalTexturePassData data, RasterGraphContext context) =>
+                    builder.SetRenderFunc((GlobalTexturePassData data, RasterGraphContext context) =>
                     {
                         context.cmd.SetGlobalVector(TexelSizeId, data.texelSize);
                         context.cmd.SetGlobalFloat(AvailableId, 1f);
