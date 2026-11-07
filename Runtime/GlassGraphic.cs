@@ -15,6 +15,7 @@ namespace Balu.LiquidGlass
         [SerializeField, Range(0f, 1f)] private float frost = 0.12f;
         [SerializeField, Range(0f, 2f)] private float rimStrength = 0.55f;
         [SerializeField] private Material materialOverride;
+        [SerializeField] private GlassPreset preset;
 
         private Graphic target;
         private Material runtimeMaterial;
@@ -41,12 +42,24 @@ namespace Balu.LiquidGlass
             Apply();
         }
 
-        private void OnEnable() { Cache(); Apply(); }
-        private void OnValidate() { if (isActiveAndEnabled) { Cache(); Apply(); } }
+        private void OnEnable()
+        {
+            Cache();
+            if (preset) ApplyPreset(preset);
+            else Apply();
+        }
+        private void OnValidate()
+        {
+            if (!isActiveAndEnabled) return;
+            Cache();
+            if (preset) ApplyPreset(preset);
+            else Apply();
+        }
 
         public void ApplyPreset(GlassPreset preset)
         {
             if (!preset) return;
+            this.preset = preset;
             tint = preset.Tint;
             intensity = preset.Intensity;
             blurRadius = preset.BlurRadius;
