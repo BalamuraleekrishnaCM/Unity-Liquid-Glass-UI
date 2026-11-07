@@ -2,6 +2,10 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+#if LIQUIDGLASS_URP17
+using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.RenderGraphModule.Util;
+#endif
 
 namespace Balu.LiquidGlass.URP
 {
@@ -70,6 +74,9 @@ namespace Balu.LiquidGlass.URP
             {
                 this.settings = settings;
                 ConfigureInput(ScriptableRenderPassInput.Color);
+#if LIQUIDGLASS_URP17
+                requiresIntermediateTexture = true;
+#endif
                 if (settings.blurShader) material = CoreUtils.CreateEngineMaterial(settings.blurShader);
             }
 
@@ -98,6 +105,59 @@ namespace Balu.LiquidGlass.URP
                 context.ExecuteCommandBuffer(cmd);
                 CommandBufferPool.Release(cmd);
             }
+
+
+#if LIQUIDGLASS_URP17
+            private sealed class GlobalTexturePassData
+            {
+                public Vector4 texelSize;
+            }
+
+            public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+            {
+                var resources = frameData.Get<UniversalResourceData>();
+                if (resources.isActiveTargetBackBuffer || material == null) return;
+
+                TextureHandle sourceTexture = resources.activeColorTexture;
+                if (!sourceTexture.IsValid()) return;
+
+                var descriptor = renderGraph.GetTextureDesc(sourceTexture);
+                descriptor.name = "_LiquidGlassBlurA";
+                descriptor.width = Mathf.Max(16, Mathf.RoundToInt(descriptor.width * settings.resolutionScale));
+                descriptor.height = Mathf.Max(16, Mathf.RoundToInt(descriptor.height * settings.resolutionScale));
+                descriptor.depthBufferBits = 0;
+                descriptor.msaaSamples = MSAASamples.None;
+                descriptor.clearBuffer = false;
+
+                TextureHandle blurTextureA = renderGraph.CreateTexture(descriptor);
+                descriptor.name = "_LiquidGlassBlurB";
+                TextureHandle blurTextureB = renderGraph.CreateTexture(descriptor);
+
+                material.SetFloat("_BlurRadius", settings.blurRadius);
+                renderGraph.AddBlitPass(
+                    new RenderGraphUtils.BlitMaterialParameters(sourceTexture, blurTextureA, material, 0),
+                    "Liquid Glass Horizontal Blur");
+                renderGraph.AddBlitPass(
+                    new RenderGraphUtils.BlitMaterialParameters(blurTextureA, blurTextureB, material, 1),
+                    "Liquid Glass Vertical Blur");
+
+                using (var builder = renderGraph.AddRasterRenderPass<GlobalTexturePassData>(
+                    "Publish Liquid Glass Backdrop", out var passData))
+                {
+                    passData.texelSize = new Vector4(
+                        1f / descriptor.width, 1f / descriptor.height,
+                        descriptor.width, descriptor.height);
+                    builder.UseTexture(blurTextureB, AccessFlags.Read);
+                    builder.SetGlobalTextureAfterPass(blurTextureB, TextureId);
+                    builder.AllowGlobalStateModification(true);
+                    builder.SetRenderFunc(static (GlobalTexturePassData data, RasterGraphContext context) =>
+                    {
+                        context.cmd.SetGlobalVector(TexelSizeId, data.texelSize);
+                        context.cmd.SetGlobalFloat(AvailableId, 1f);
+                    });
+                }
+            }
+#endif
 
             public void Dispose()
             {
