@@ -29,12 +29,12 @@ namespace Balu.LiquidGlass
         private static readonly int RimId = Shader.PropertyToID("_RimStrength");
         private static readonly int GlassRectId = Shader.PropertyToID("_GlassRect");
 
-        public Color Tint { get => tint; set { tint = value; Apply(); } }
-        public float Intensity { get => intensity; set { intensity = Mathf.Clamp01(value); Apply(); } }
-        public float BlurRadius { get => blurRadius; set { blurRadius = Mathf.Clamp(value, 0f, 12f); Apply(); } }
-        public float Refraction { get => refraction; set { refraction = Mathf.Clamp(value, 0f, 0.08f); Apply(); } }
-        public float Frost { get => frost; set { frost = Mathf.Clamp01(value); Apply(); } }
-        public float RimStrength { get => rimStrength; set { rimStrength = Mathf.Clamp(value, 0f, 2f); Apply(); } }
+        public Color Tint { get => tint; set { tint = value; SetColor(TintId, tint); } }
+        public float Intensity { get => intensity; set { intensity = Mathf.Clamp01(value); SetFloat(IntensityId, intensity); } }
+        public float BlurRadius { get => blurRadius; set { blurRadius = Mathf.Clamp(value, 0f, 12f); SetFloat(BlurRadiusId, blurRadius); } }
+        public float Refraction { get => refraction; set { refraction = Mathf.Clamp(value, 0f, 0.08f); SetFloat(RefractionId, refraction); } }
+        public float Frost { get => frost; set { frost = Mathf.Clamp01(value); SetFloat(FrostId, frost); } }
+        public float RimStrength { get => rimStrength; set { rimStrength = Mathf.Clamp(value, 0f, 2f); SetFloat(RimId, rimStrength); } }
 
         private void Awake()
         {
@@ -110,6 +110,16 @@ namespace Balu.LiquidGlass
         }
 
         private void OnRectTransformDimensionsChange() { if (isActiveAndEnabled) Apply(); }
+
+        private void SetFloat(int id, float value)
+        {
+            if (runtimeMaterial && runtimeMaterial.HasProperty(id)) runtimeMaterial.SetFloat(id, value);
+        }
+
+        private void SetColor(int id, Color value)
+        {
+            if (runtimeMaterial && runtimeMaterial.HasProperty(id)) runtimeMaterial.SetColor(id, value);
+        }
 
         private void Cache()
         {
