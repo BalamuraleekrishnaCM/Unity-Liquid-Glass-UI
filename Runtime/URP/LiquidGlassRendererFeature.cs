@@ -26,7 +26,11 @@ namespace Balu.LiquidGlass.URP
 
         public override void Create()
         {
-            if (!settings.blurShader) settings.blurShader = Shader.Find("Hidden/Balu/LiquidGlass/URPGaussianBlur");
+            if (!settings.blurShader)
+            {
+                var bundledBlur = Resources.Load<Material>("LiquidGlassBlurURP");
+                settings.blurShader = bundledBlur ? bundledBlur.shader : Shader.Find("Hidden/Balu/LiquidGlass/URPGaussianBlur");
+            }
             pass = new LiquidGlassBlurPass(settings);
         }
 
