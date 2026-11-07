@@ -1,0 +1,7 @@
+{
+  "name": "UnityLiquidGlass.Editor",
+  "rootNamespace": "Balu.LiquidGlass.Editor",
+  "references": ["UnityLiquidGlass.Runtime", "Unity.TextMeshPro", "UnityEngine.UI"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}
