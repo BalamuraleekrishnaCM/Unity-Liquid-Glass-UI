@@ -52,6 +52,7 @@ namespace Balu.LiquidGlass.Editor
             var plate = AddImage(go.transform, "Glass Surface", new Color(0.78f, 0.89f, 1f, 0.30f));
             plate.gameObject.AddComponent<GlassGraphic>();
             var button = go.AddComponent<Button>();
+            go.AddComponent<GlassPointerFeedback>();
             button.targetGraphic = plate;
             button.transition = Selectable.Transition.ColorTint;
             button.colors = SoftColors();
@@ -108,6 +109,7 @@ namespace Balu.LiquidGlass.Editor
             var bg = AddImage(go.transform, "Glass Surface", new Color(0.78f, 0.89f, 1f, 0.24f));
             bg.gameObject.AddComponent<GlassGraphic>();
             var toggle = go.AddComponent<Toggle>();
+            go.AddComponent<GlassPointerFeedback>();
             toggle.targetGraphic = bg;
 
             var mark = AddImage(go.transform, "Checkmark", new Color(0.35f, 0.85f, 1f, 0.95f));
@@ -136,6 +138,7 @@ namespace Balu.LiquidGlass.Editor
             var bg = AddImage(go.transform, "Glass Track", new Color(0.78f, 0.89f, 1f, 0.24f));
             bg.gameObject.AddComponent<GlassGraphic>();
             var slider = go.AddComponent<Slider>();
+            go.AddComponent<GlassPointerFeedback>();
             slider.targetGraphic = bg;
 
             var fillArea = CreateRect("Fill Area", go.transform);
@@ -149,6 +152,10 @@ namespace Balu.LiquidGlass.Editor
             var handleArea = CreateRect("Handle Slide Area", go.transform);
             Stretch(handleArea, 8, 0, 8, 0);
             var handle = AddImage(handleArea, "Handle", new Color(1f, 1f, 1f, 0.9f));
+            handle.rectTransform.anchorMin = new Vector2(0f, 0.5f);
+            handle.rectTransform.anchorMax = new Vector2(0f, 0.5f);
+            handle.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            handle.rectTransform.anchoredPosition = Vector2.zero;
             handle.rectTransform.sizeDelta = new Vector2(26, 26);
             slider.fillRect = fill.rectTransform;
             slider.handleRect = handle.rectTransform;
@@ -164,6 +171,7 @@ namespace Balu.LiquidGlass.Editor
             var bg = AddImage(go.transform, "Glass Surface", new Color(0.78f, 0.89f, 1f, 0.28f));
             bg.gameObject.AddComponent<GlassGraphic>();
             var dropdown = go.AddComponent<TMP_Dropdown>();
+            go.AddComponent<GlassPointerFeedback>();
             dropdown.targetGraphic = bg;
 
             var caption = AddTMP(go.transform, "Caption", "Option A");
@@ -193,6 +201,14 @@ namespace Balu.LiquidGlass.Editor
             viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
 
             var content = CreateRect("Content", viewport);
+            var layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            layout.childControlWidth = true;
+            layout.childControlHeight = false;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+            layout.spacing = 2f;
+            var fitter = content.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             content.anchorMin = new Vector2(0, 1);
             content.anchorMax = Vector2.one;
             content.pivot = new Vector2(0.5f, 1);
@@ -204,13 +220,17 @@ namespace Balu.LiquidGlass.Editor
             item.pivot = new Vector2(0.5f, 1);
             item.sizeDelta = new Vector2(0, 36);
             var itemBg = AddImage(item, "Item Background", new Color(0.4f, 0.7f, 0.95f, 0.18f));
+            var itemLayout = item.gameObject.AddComponent<LayoutElement>();
+            itemLayout.preferredHeight = 36f;
             var itemToggle = item.gameObject.AddComponent<Toggle>();
             itemToggle.targetGraphic = itemBg;
+            itemToggle.transition = Selectable.Transition.ColorTint;
             var itemLabel = AddTMP(item, "Item Label", "Option");
             Stretch(itemLabel.rectTransform, 12, 2, 8, 2);
             itemLabel.fontSize = 22;
             itemLabel.alignment = TextAlignmentOptions.MidlineLeft;
             itemToggle.graphic = null;
+            itemToggle.isOn = false;
 
             scroll.viewport = viewport;
             scroll.content = content;
@@ -260,6 +280,49 @@ namespace Balu.LiquidGlass.Editor
             bar.handleRect = handle.rectTransform;
             bar.targetGraphic = handle;
             Place(go, cmd);
+        }
+
+
+        [MenuItem(Root + "Button (Legacy)", false, 40)]
+        private static void CreateLegacyButton(MenuCommand cmd) => CreateLegacy(DefaultControls.CreateButton(Resources()), "Glass Button (Legacy)", cmd);
+
+        [MenuItem(Root + "Text (Legacy)", false, 41)]
+        private static void CreateLegacyText(MenuCommand cmd) => CreateLegacy(DefaultControls.CreateText(Resources()), "Glass Text (Legacy)", cmd);
+
+        [MenuItem(Root + "Input Field (Legacy)", false, 42)]
+        private static void CreateLegacyInput(MenuCommand cmd) => CreateLegacy(DefaultControls.CreateInputField(Resources()), "Glass Input Field (Legacy)", cmd);
+
+        [MenuItem(Root + "Dropdown (Legacy)", false, 43)]
+        private static void CreateLegacyDropdown(MenuCommand cmd) => CreateLegacy(DefaultControls.CreateDropdown(Resources()), "Glass Dropdown (Legacy)", cmd);
+
+        private static DefaultControls.Resources Resources()
+        {
+            return new DefaultControls.Resources
+            {
+                standard = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd"),
+                background = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Background.psd"),
+                inputField = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/InputFieldBackground.psd"),
+                knob = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd"),
+                checkmark = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Checkmark.psd"),
+                dropdown = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/DropdownArrow.psd"),
+                mask = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UIMask.psd")
+            };
+        }
+
+        private static void CreateLegacy(GameObject go, string name, MenuCommand cmd)
+        {
+            go.name = name;
+            var graphics = go.GetComponentsInChildren<Graphic>(true);
+            if (graphics.Length > 0)
+            {
+                var surface = graphics[0];
+                surface.gameObject.AddComponent<GlassGraphic>();
+            }
+            if (go.GetComponent<Selectable>())
+                go.AddComponent<GlassPointerFeedback>();
+            GameObjectUtility.SetParentAndAlign(go, cmd.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create " + name);
+            Selection.activeGameObject = go;
         }
 
         private static void CreateGlassGraphic(string name, MenuCommand cmd)
