@@ -61,7 +61,9 @@ namespace Balu.LiquidGlass
             if (!target) Cache();
             if (!target) return;
 
-            Shader shader = materialOverride ? materialOverride.shader : Shader.Find("Balu/LiquidGlass/UI");
+            Material bundledTemplate = Resources.Load<Material>("LiquidGlassDefault");
+            Shader shader = materialOverride ? materialOverride.shader :
+                (bundledTemplate ? bundledTemplate.shader : Shader.Find("Balu/LiquidGlass/UI"));
             if (!shader) return;
 
             if (!runtimeMaterial || runtimeMaterial.shader != shader)
