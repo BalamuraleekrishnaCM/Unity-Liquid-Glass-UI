@@ -11,6 +11,8 @@ Shader "Balu/LiquidGlass/UI"
         _Frost ("Frost", Range(0,1)) = 0.12
         _RimStrength ("Rim Strength", Range(0,2)) = 0.55
         [HideInInspector] _GlassRect ("Glass Rect", Vector) = (0,0,100,100)
+        _CornerRadius ("Corner Radius", Float) = 22
+        _EdgeSoftness ("Edge Softness", Range(0.1,4)) = 1
         _StencilComp ("Stencil Comparison", Float) = 8
         _Stencil ("Stencil ID", Float) = 0
         _StencilOp ("Stencil Operation", Float) = 0
@@ -56,7 +58,7 @@ Shader "Balu/LiquidGlass/UI"
             float4 _LiquidGlassBackground_TexelSize;
             fixed4 _Color;
             fixed4 _GlassTint;
-            float _GlassIntensity, _BlurRadius, _Refraction, _Frost, _RimStrength;
+            float _GlassIntensity, _BlurRadius, _Refraction, _Frost, _RimStrength, _CornerRadius, _EdgeSoftness;
             float _LiquidGlassBackgroundAvailable;
             float4 _GlassRect;
             float4 _MainTex_ST;
@@ -118,7 +120,13 @@ Shader "Balu/LiquidGlass/UI"
                 glass += rim * 0.18;
                 glass = lerp(_GlassTint.rgb, glass, saturate(_GlassIntensity + 0.2));
 
-                fixed alpha = sprite.a * saturate(_GlassTint.a + _GlassIntensity * 0.18);
+                float2 halfSize = _GlassRect.zw * 0.5;
+                float2 localPosition = i.localPosition - (_GlassRect.xy + halfSize);
+                float radius = clamp(_CornerRadius, 0.0, min(halfSize.x, halfSize.y));
+                float2 roundedQ = abs(localPosition) - halfSize + radius;
+                float roundedDistance = length(max(roundedQ, 0.0)) + min(max(roundedQ.x, roundedQ.y), 0.0) - radius;
+                float roundedAlpha = 1.0 - smoothstep(-_EdgeSoftness, _EdgeSoftness, roundedDistance);
+                fixed alpha = sprite.a * saturate(_GlassTint.a + _GlassIntensity * 0.18) * roundedAlpha;
                 fixed4 result = fixed4(glass * sprite.rgb, alpha);
                 #ifdef UNITY_UI_CLIP_RECT
                     result.a *= UnityGet2DClipping(i.worldPosition.xy, _ClipRect);
