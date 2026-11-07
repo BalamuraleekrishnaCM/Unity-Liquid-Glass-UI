@@ -42,6 +42,7 @@ namespace Balu.LiquidGlass.Editor
             var go = CreateRect("Glass Raw Image");
             var image = go.AddComponent<RawImage>();
             image.color = new Color(0.85f, 0.93f, 1f, 0.28f);
+            go.AddComponent<GlassGraphic>();
             Place(go, cmd);
         }
 
@@ -312,12 +313,14 @@ namespace Balu.LiquidGlass.Editor
         private static void CreateLegacy(GameObject go, string name, MenuCommand cmd)
         {
             go.name = name;
-            var graphics = go.GetComponentsInChildren<Graphic>(true);
-            if (graphics.Length > 0)
+            var surface = go.GetComponent<Image>();
+            if (!surface)
             {
-                var surface = graphics[0];
-                surface.gameObject.AddComponent<GlassGraphic>();
+                var images = go.GetComponentsInChildren<Image>(true);
+                if (images.Length > 0) surface = images[0];
             }
+            if (surface && !surface.GetComponent<GlassGraphic>())
+                surface.gameObject.AddComponent<GlassGraphic>();
             if (go.GetComponent<Selectable>())
                 go.AddComponent<GlassPointerFeedback>();
             GameObjectUtility.SetParentAndAlign(go, cmd.context as GameObject);
