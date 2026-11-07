@@ -7,12 +7,19 @@
     "Unity.RenderPipelines.Universal.Runtime"
   ],
   "includePlatforms": [],
-  "defineConstraints": ["LIQUIDGLASS_URP"],
+  "defineConstraints": [
+    "LIQUIDGLASS_URP"
+  ],
   "versionDefines": [
     {
       "name": "com.unity.render-pipelines.universal",
       "expression": "14.0.0",
       "define": "LIQUIDGLASS_URP"
+    },
+    {
+      "name": "com.unity.render-pipelines.universal",
+      "expression": "17.0.0",
+      "define": "LIQUIDGLASS_URP17"
     }
   ],
   "autoReferenced": true
