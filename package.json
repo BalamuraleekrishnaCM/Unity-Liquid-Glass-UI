@@ -1,0 +1,12 @@
+{
+  "name": "com.balu.unity-liquid-glass",
+  "version": "2.0.0",
+  "displayName": "Unity Liquid Glass UI",
+  "description": "A cross-platform, editor-integrated Liquid Glass UI toolkit for Unity uGUI and TextMeshPro.",
+  "unity": "2022.3",
+  "dependencies": {
+    "com.unity.ugui": "1.0.0",
+    "com.unity.textmeshpro": "3.0.6"
+  },
+  "author": { "name": "BalamuraleekrishnaCM" }
+}
