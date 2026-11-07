@@ -19,6 +19,10 @@ namespace Balu.LiquidGlass
         private void Awake()
         {
             if (!glass) glass = GetComponentInChildren<GlassGraphic>();
+        }
+
+        private void Start()
+        {
             if (glass) baseIntensity = glass.Intensity;
             targetIntensity = baseIntensity;
         }
