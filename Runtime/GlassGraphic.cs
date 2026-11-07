@@ -14,6 +14,8 @@ namespace Balu.LiquidGlass
         [SerializeField, Range(0f, 0.08f)] private float refraction = 0.012f;
         [SerializeField, Range(0f, 1f)] private float frost = 0.12f;
         [SerializeField, Range(0f, 2f)] private float rimStrength = 0.55f;
+        [SerializeField, Range(0f, 128f)] private float cornerRadius = 22f;
+        [SerializeField, Range(0.1f, 4f)] private float edgeSoftness = 1f;
         [SerializeField] private Material materialOverride;
         [SerializeField] private GlassPreset preset;
         private GlassPreset lastPreset;
@@ -29,6 +31,8 @@ namespace Balu.LiquidGlass
         private static readonly int FrostId = Shader.PropertyToID("_Frost");
         private static readonly int RimId = Shader.PropertyToID("_RimStrength");
         private static readonly int GlassRectId = Shader.PropertyToID("_GlassRect");
+        private static readonly int CornerRadiusId = Shader.PropertyToID("_CornerRadius");
+        private static readonly int EdgeSoftnessId = Shader.PropertyToID("_EdgeSoftness");
 
         public Color Tint { get => tint; set { tint = value; SetColor(TintId, tint); } }
         public float Intensity { get => intensity; set { intensity = Mathf.Clamp01(value); SetFloat(IntensityId, intensity); } }
@@ -36,6 +40,8 @@ namespace Balu.LiquidGlass
         public float Refraction { get => refraction; set { refraction = Mathf.Clamp(value, 0f, 0.08f); SetFloat(RefractionId, refraction); } }
         public float Frost { get => frost; set { frost = Mathf.Clamp01(value); SetFloat(FrostId, frost); } }
         public float RimStrength { get => rimStrength; set { rimStrength = Mathf.Clamp(value, 0f, 2f); SetFloat(RimId, rimStrength); } }
+        public float CornerRadius { get => cornerRadius; set { cornerRadius = Mathf.Clamp(value, 0f, 128f); SetFloat(CornerRadiusId, cornerRadius); } }
+        public float EdgeSoftness { get => edgeSoftness; set { edgeSoftness = Mathf.Clamp(value, 0.1f, 4f); SetFloat(EdgeSoftnessId, edgeSoftness); } }
 
         private void Awake()
         {
@@ -75,6 +81,8 @@ namespace Balu.LiquidGlass
             refraction = preset.Refraction;
             frost = preset.Frost;
             rimStrength = preset.RimStrength;
+            cornerRadius = preset.CornerRadius;
+            edgeSoftness = preset.EdgeSoftness;
             materialOverride = preset.Material;
             Apply();
         }
@@ -107,6 +115,8 @@ namespace Balu.LiquidGlass
             if (runtimeMaterial.HasProperty(RefractionId)) runtimeMaterial.SetFloat(RefractionId, refraction);
             if (runtimeMaterial.HasProperty(FrostId)) runtimeMaterial.SetFloat(FrostId, frost);
             if (runtimeMaterial.HasProperty(RimId)) runtimeMaterial.SetFloat(RimId, rimStrength);
+            if (runtimeMaterial.HasProperty(CornerRadiusId)) runtimeMaterial.SetFloat(CornerRadiusId, cornerRadius);
+            if (runtimeMaterial.HasProperty(EdgeSoftnessId)) runtimeMaterial.SetFloat(EdgeSoftnessId, edgeSoftness);
             if (runtimeMaterial.HasProperty(GlassRectId))
             {
                 Rect rect = target.rectTransform.rect;
