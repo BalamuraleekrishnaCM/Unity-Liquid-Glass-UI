@@ -19,6 +19,7 @@ namespace Balu.LiquidGlass
         private Graphic target;
         private Material runtimeMaterial;
         private Material originalMaterial;
+        private bool originalMaterialCaptured;
         private static readonly int TintId = Shader.PropertyToID("_GlassTint");
         private static readonly int IntensityId = Shader.PropertyToID("_GlassIntensity");
         private static readonly int BlurRadiusId = Shader.PropertyToID("_BlurRadius");
@@ -89,7 +90,15 @@ namespace Balu.LiquidGlass
             target.color = Color.white;
         }
 
-        private void Cache() => target = GetComponent<Graphic>();
+        private void Cache()
+        {
+            target = GetComponent<Graphic>();
+            if (target && !originalMaterialCaptured)
+            {
+                originalMaterial = target.material;
+                originalMaterialCaptured = true;
+            }
+        }
 
         private void OnDestroy()
         {
