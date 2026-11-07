@@ -52,7 +52,7 @@ Shader "Balu/LiquidGlass/UI"
             #include "UnityUI.cginc"
 
             sampler2D _MainTex;
-            sampler2D _LiquidGlassBackground;
+            UNITY_DECLARE_SCREENSPACE_TEXTURE(_LiquidGlassBackground);
             float4 _LiquidGlassBackground_TexelSize;
             fixed4 _Color;
             fixed4 _GlassTint;
@@ -74,11 +74,13 @@ Shader "Balu/LiquidGlass/UI"
                 float2 uv : TEXCOORD0;
                 float4 worldPosition : TEXCOORD1;
                 float4 screenPos : TEXCOORD2;
+                UNITY_VERTEX_OUTPUT_STEREO
             };
 
             v2f vert(appdata_t v)
             {
                 v2f o;
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 o.worldPosition = v.vertex;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.screenPos = ComputeScreenPos(o.vertex);
@@ -89,6 +91,7 @@ Shader "Balu/LiquidGlass/UI"
 
             fixed4 frag(v2f i) : SV_Target
             {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
                 fixed4 sprite = tex2D(_MainTex, i.uv) * i.color;
                 float2 screenUV = i.screenPos.xy / max(i.screenPos.w, 0.0001);
                 float2 centered = i.uv - 0.5;
@@ -96,11 +99,11 @@ Shader "Balu/LiquidGlass/UI"
                 float2 sampleUV = saturate(screenUV + warp);
 
                 float2 blurStep = _LiquidGlassBackground_TexelSize.xy * max(_BlurRadius, 0.0);
-                fixed3 backdrop = tex2D(_LiquidGlassBackground, sampleUV).rgb * 0.40;
-                backdrop += tex2D(_LiquidGlassBackground, sampleUV + float2(blurStep.x, 0)).rgb * 0.15;
-                backdrop += tex2D(_LiquidGlassBackground, sampleUV - float2(blurStep.x, 0)).rgb * 0.15;
-                backdrop += tex2D(_LiquidGlassBackground, sampleUV + float2(0, blurStep.y)).rgb * 0.15;
-                backdrop += tex2D(_LiquidGlassBackground, sampleUV - float2(0, blurStep.y)).rgb * 0.15;
+                fixed3 backdrop = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV).rgb * 0.40;
+                backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV + float2(blurStep.x, 0)).rgb * 0.15;
+                backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV - float2(blurStep.x, 0)).rgb * 0.15;
+                backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV + float2(0, blurStep.y)).rgb * 0.15;
+                backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV - float2(0, blurStep.y)).rgb * 0.15;
                 fixed3 glass = lerp(_GlassTint.rgb, backdrop, saturate(_LiquidGlassBackgroundAvailable * _GlassIntensity));
                 glass = lerp(glass, _GlassTint.rgb, _Frost * 0.45);
 
