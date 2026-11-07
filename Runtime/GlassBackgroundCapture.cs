@@ -29,7 +29,11 @@ namespace Balu.LiquidGlass
             if (GraphicsSettings.currentRenderPipeline != null)
                 Debug.LogWarning("GlassBackgroundCapture is for the Built-in Render Pipeline. Add LiquidGlassRendererFeature to your URP Renderer Data instead.", this);
 
-            if (!blurShader) blurShader = Shader.Find("Hidden/Balu/LiquidGlass/GaussianBlur");
+            if (!blurShader)
+            {
+                var bundledBlur = Resources.Load<Material>("LiquidGlassBlurBuiltIn");
+                blurShader = bundledBlur ? bundledBlur.shader : Shader.Find("Hidden/Balu/LiquidGlass/GaussianBlur");
+            }
             if (blurShader) blurMaterial = new Material(blurShader) { hideFlags = HideFlags.HideAndDontSave };
             Shader.SetGlobalFloat(BackgroundAvailableId, 0f);
         }
