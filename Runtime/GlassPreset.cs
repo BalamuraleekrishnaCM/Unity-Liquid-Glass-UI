@@ -11,6 +11,8 @@ namespace Balu.LiquidGlass
         [SerializeField, Range(0f, 0.08f)] private float refraction = 0.012f;
         [SerializeField, Range(0f, 1f)] private float frost = 0.12f;
         [SerializeField, Range(0f, 2f)] private float rimStrength = 0.55f;
+        [SerializeField, Range(0f, 128f)] private float cornerRadius = 22f;
+        [SerializeField, Range(0.1f, 4f)] private float edgeSoftness = 1f;
         [SerializeField] private Material material;
 
         public Color Tint => tint;
@@ -19,6 +21,8 @@ namespace Balu.LiquidGlass
         public float Refraction => refraction;
         public float Frost => frost;
         public float RimStrength => rimStrength;
+        public float CornerRadius => cornerRadius;
+        public float EdgeSoftness => edgeSoftness;
         public Material Material => material;
     }
 }
