@@ -3,58 +3,105 @@ using UnityEngine.UI;
 
 namespace Balu.LiquidGlass
 {
-    /// <summary>
-    /// Lightweight glass surface marker for uGUI Graphics. Assign a compatible
-    /// material/shader to Material Override to render a custom glass treatment.
-    /// The default appearance remains a translucent tint when no material is set.
-    /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Graphic))]
     [AddComponentMenu("UI/Liquid Glass/Glass Graphic")]
     public sealed class GlassGraphic : MonoBehaviour
     {
-        [SerializeField] private Color tint = new Color(0.82f, 0.91f, 1f, 0.28f);
-        [SerializeField, Range(0f, 1f)] private float intensity = 0.65f;
+        [SerializeField] private Color tint = new Color(0.82f, 0.91f, 1f, 0.30f);
+        [SerializeField, Range(0f, 1f)] private float intensity = 0.72f;
+        [SerializeField, Range(0f, 12f)] private float blurRadius = 3.5f;
+        [SerializeField, Range(0f, 0.08f)] private float refraction = 0.012f;
+        [SerializeField, Range(0f, 1f)] private float frost = 0.12f;
+        [SerializeField, Range(0f, 2f)] private float rimStrength = 0.55f;
         [SerializeField] private Material materialOverride;
-
-        public Color Tint { get => tint; set { tint = value; Apply(); } }
-        public float Intensity { get => intensity; set { intensity = Mathf.Clamp01(value); Apply(); } }
 
         private Graphic target;
         private Material runtimeMaterial;
+        private Material originalMaterial;
+        private static readonly int TintId = Shader.PropertyToID("_GlassTint");
+        private static readonly int IntensityId = Shader.PropertyToID("_GlassIntensity");
+        private static readonly int BlurRadiusId = Shader.PropertyToID("_BlurRadius");
+        private static readonly int RefractionId = Shader.PropertyToID("_Refraction");
+        private static readonly int FrostId = Shader.PropertyToID("_Frost");
+        private static readonly int RimId = Shader.PropertyToID("_RimStrength");
 
-        private void Awake() { Cache(); Apply(); }
+        public Color Tint { get => tint; set { tint = value; Apply(); } }
+        public float Intensity { get => intensity; set { intensity = Mathf.Clamp01(value); Apply(); } }
+        public float BlurRadius { get => blurRadius; set { blurRadius = Mathf.Clamp(value, 0f, 12f); Apply(); } }
+        public float Refraction { get => refraction; set { refraction = Mathf.Clamp(value, 0f, 0.08f); Apply(); } }
+        public float Frost { get => frost; set { frost = Mathf.Clamp01(value); Apply(); } }
+        public float RimStrength { get => rimStrength; set { rimStrength = Mathf.Clamp(value, 0f, 2f); Apply(); } }
+
+        private void Awake()
+        {
+            Cache();
+            if (target) originalMaterial = target.material;
+            Apply();
+        }
+
         private void OnEnable() { Cache(); Apply(); }
         private void OnValidate() { if (isActiveAndEnabled) { Cache(); Apply(); } }
-        private void OnDestroy()
+
+        public void ApplyPreset(GlassPreset preset)
         {
-            if (runtimeMaterial != null)
+            if (!preset) return;
+            tint = preset.Tint;
+            intensity = preset.Intensity;
+            blurRadius = preset.BlurRadius;
+            refraction = preset.Refraction;
+            frost = preset.Frost;
+            rimStrength = preset.RimStrength;
+            materialOverride = preset.Material;
+            Apply();
+        }
+
+        public void Apply()
+        {
+            if (!target) Cache();
+            if (!target) return;
+
+            Shader shader = materialOverride ? materialOverride.shader : Shader.Find("Balu/LiquidGlass/UI");
+            if (!shader) return;
+
+            if (!runtimeMaterial || runtimeMaterial.shader != shader)
             {
-                if (Application.isPlaying) Destroy(runtimeMaterial);
-                else DestroyImmediate(runtimeMaterial);
+                DestroyRuntimeMaterial();
+                runtimeMaterial = materialOverride
+                    ? new Material(materialOverride)
+                    : new Material(shader);
+                runtimeMaterial.name = "Liquid Glass UI (Instance)";
+                runtimeMaterial.hideFlags = HideFlags.HideAndDontSave;
             }
+            if (materialOverride && runtimeMaterial.shader == materialOverride.shader)
+                runtimeMaterial.CopyPropertiesFromMaterial(materialOverride);
+
+            if (runtimeMaterial.HasProperty(TintId)) runtimeMaterial.SetColor(TintId, tint);
+            if (runtimeMaterial.HasProperty(IntensityId)) runtimeMaterial.SetFloat(IntensityId, intensity);
+            if (runtimeMaterial.HasProperty(BlurRadiusId)) runtimeMaterial.SetFloat(BlurRadiusId, blurRadius);
+            if (runtimeMaterial.HasProperty(RefractionId)) runtimeMaterial.SetFloat(RefractionId, refraction);
+            if (runtimeMaterial.HasProperty(FrostId)) runtimeMaterial.SetFloat(FrostId, frost);
+            if (runtimeMaterial.HasProperty(RimId)) runtimeMaterial.SetFloat(RimId, rimStrength);
+
+            target.material = runtimeMaterial;
+            target.color = Color.white;
         }
 
         private void Cache() => target = GetComponent<Graphic>();
 
-        private void Apply()
+        private void OnDestroy()
         {
-            if (!target) Cache();
-            if (!target) return;
-            target.color = tint;
-            if (materialOverride == null) return;
-            if (runtimeMaterial == null || runtimeMaterial.shader != materialOverride.shader)
-            {
-                if (runtimeMaterial != null)
-                {
-                    if (Application.isPlaying) Destroy(runtimeMaterial);
-                    else DestroyImmediate(runtimeMaterial);
-                }
-                runtimeMaterial = new Material(materialOverride) { name = materialOverride.name + " (Glass Instance)" };
-            }
-            target.material = runtimeMaterial;
-            if (runtimeMaterial.HasProperty("_GlassIntensity"))
-                runtimeMaterial.SetFloat("_GlassIntensity", intensity);
+            if (target && target.material == runtimeMaterial)
+                target.material = originalMaterial;
+            DestroyRuntimeMaterial();
+        }
+
+        private void DestroyRuntimeMaterial()
+        {
+            if (!runtimeMaterial) return;
+            if (Application.isPlaying) Destroy(runtimeMaterial);
+            else DestroyImmediate(runtimeMaterial);
+            runtimeMaterial = null;
         }
     }
 }
