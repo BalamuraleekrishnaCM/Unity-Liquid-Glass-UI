@@ -53,6 +53,8 @@ namespace Balu.LiquidGlass
             Graphics.Blit(source, horizontal, blurMaterial, 0);
             Graphics.Blit(horizontal, blurred, blurMaterial, 1);
             Shader.SetGlobalTexture("_LiquidGlassBackground", blurred);
+            Shader.SetGlobalVector("_LiquidGlassBackground_TexelSize",
+                new Vector4(1f / blurred.width, 1f / blurred.height, blurred.width, blurred.height));
             Shader.SetGlobalFloat(BackgroundAvailableId, 1f);
             Graphics.Blit(source, destination);
         }
