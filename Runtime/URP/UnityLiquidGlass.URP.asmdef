@@ -1,0 +1,19 @@
+{
+  "name": "UnityLiquidGlass.URP",
+  "rootNamespace": "Balu.LiquidGlass.URP",
+  "references": [
+    "UnityLiquidGlass.Runtime",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.Universal.Runtime"
+  ],
+  "includePlatforms": [],
+  "defineConstraints": ["LIQUIDGLASS_URP"],
+  "versionDefines": [
+    {
+      "name": "com.unity.render-pipelines.universal",
+      "expression": "14.0.0",
+      "define": "LIQUIDGLASS_URP"
+    }
+  ],
+  "autoReferenced": true
+}
