@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2.1.0
-- Added a uGUI glass shader with backdrop sampling, tint, frost, rim lighting and screen-space refraction.
+- Added a uGUI glass shader with backdrop sampling, tint, frost, rim lighting, screen-space refraction and rounded corners.
 - Added separable Gaussian blur shaders for Built-in RP and URP.
 - Added Built-in RP camera capture and blur component.
 - Added optional URP Renderer Feature assembly: compatibility pass for URP 14 and native RenderGraph path for URP 17+ (Unity 6), with XR-aware Blitter shader path.
