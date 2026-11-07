@@ -23,6 +23,22 @@ namespace Balu.LiquidGlass.Editor
             EnsureEventSystem();
         }
 
+
+        [MenuItem(Root + "World Space Canvas (XR)", false, 11)]
+        private static void CreateWorldCanvas(MenuCommand cmd)
+        {
+            var go = new GameObject("Liquid Glass World Canvas", typeof(RectTransform), typeof(Canvas),
+                typeof(CanvasScaler), typeof(GraphicRaycaster));
+            var canvas = go.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            var rect = go.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(1200, 800);
+            rect.localScale = Vector3.one * 0.001f;
+            go.GetComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+            Place(go, cmd);
+            EnsureEventSystem();
+        }
+
         [MenuItem(Root + "Panel", false, 20)]
         private static void CreatePanel(MenuCommand cmd) => CreateGlassGraphic("Glass Panel", cmd);
 
@@ -82,6 +98,7 @@ namespace Balu.LiquidGlass.Editor
             var bg = AddImage(go.transform, "Glass Surface", new Color(0.78f, 0.89f, 1f, 0.26f));
             bg.gameObject.AddComponent<GlassGraphic>();
             var field = go.AddComponent<TMP_InputField>();
+            go.AddComponent<GlassPointerFeedback>();
             field.targetGraphic = bg;
 
             var viewport = CreateRect("Text Area", go.transform);
@@ -274,6 +291,7 @@ namespace Balu.LiquidGlass.Editor
             var bg = AddImage(go.transform, "Background", new Color(0.78f, 0.89f, 1f, 0.20f));
             bg.gameObject.AddComponent<GlassGraphic>();
             var bar = go.AddComponent<Scrollbar>();
+            go.AddComponent<GlassPointerFeedback>();
             var area = CreateRect("Sliding Area", go.transform);
             Stretch(area, 4, 4, 4, 4);
             var handle = AddImage(area, "Handle", new Color(0.8f, 0.92f, 1f, 0.8f));
