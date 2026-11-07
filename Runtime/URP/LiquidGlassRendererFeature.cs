@@ -26,7 +26,7 @@ namespace Balu.LiquidGlass.URP
 
         public override void Create()
         {
-            if (!settings.blurShader) settings.blurShader = Shader.Find("Hidden/Balu/LiquidGlass/GaussianBlur");
+            if (!settings.blurShader) settings.blurShader = Shader.Find("Hidden/Balu/LiquidGlass/URPGaussianBlur");
             pass = new LiquidGlassBlurPass(settings);
         }
 
@@ -82,8 +82,8 @@ namespace Balu.LiquidGlass.URP
                 if (source == null || blurA == null || blurB == null || material == null) return;
                 var cmd = CommandBufferPool.Get("Liquid Glass Backdrop Blur");
                 material.SetFloat("_BlurRadius", settings.blurRadius);
-                cmd.Blit(source.nameID, blurA.nameID, material, 0);
-                cmd.Blit(blurA.nameID, blurB.nameID, material, 1);
+                Blitter.BlitCameraTexture(cmd, source, blurA, material, 0);
+                Blitter.BlitCameraTexture(cmd, blurA, blurB, material, 1);
                 cmd.SetGlobalTexture(TextureId, blurB.nameID);
                 cmd.SetGlobalFloat(AvailableId, 1f);
                 context.ExecuteCommandBuffer(cmd);
