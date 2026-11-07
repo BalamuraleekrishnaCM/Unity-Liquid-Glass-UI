@@ -45,6 +45,7 @@ Shader "Balu/LiquidGlass/UI"
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.5
+            #pragma multi_compile_instancing
             #pragma multi_compile_local _ UNITY_UI_CLIP_RECT
             #pragma multi_compile_local _ UNITY_UI_ALPHACLIP
             #include "UnityCG.cginc"
