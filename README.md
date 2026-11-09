@@ -15,6 +15,25 @@ The following artwork illustrates the visual direction and feature areas of the 
 ### XR / World Space UI
 ![Liquid Glass XR concept](Screenshots/liquid-glass-xr.svg)
 
+## Interactive sample scene
+
+In Unity 2022.3 LTS or Unity 6, import this package and its TextMeshPro dependency, then run:
+
+**Tools → Liquid Glass → Create Sample Scene**
+
+The command asks before discarding scene changes, creates and saves `Assets/LiquidGlassShowcase.unity`, and selects the showcase Canvas. Open the scene and press **Play**.
+
+The generated showcase contains a colorful camera backdrop, frosted glass panels, a responsive button with pointer feedback, three sliders for blur/frost/refraction, a rim-light toggle, an Arctic/Rose/Mint tint dropdown, a name input, and a status readout. The scene uses uGUI and TMP. The generated controls modify the glass material in real time.
+
+**Important setup:**
+- Import **Window → TextMeshPro → Import TMP Essential Resources** if text is missing.
+- **Built-in RP:** the generator adds `GlassBackgroundCapture` to the camera automatically.
+- **URP:** add **Liquid Glass Renderer Feature** to your active Universal Renderer Data. The generator cannot safely modify your project's URP renderer asset automatically.
+- **XR:** this demo is a screen-space desktop interaction showcase, not a preconfigured headset scene. To test XR, create a World Space Canvas and configure the tracked-device raycaster and XR UI input module.
+- **Validation:** source is committed, but compilation, UI layout, actual blur output, and device behavior have not been verified in a running Unity Editor.
+
+The builder is in `Editor/LiquidGlassShowcaseBuilder.cs`; the runtime controller is in `Runtime/Samples/LiquidGlassShowcase.cs`. You can regenerate the sample using the same menu command, which overwrites the generated scene at `Assets/LiquidGlassShowcase.unity` after the scene-save prompt.
+
 ## Install from Git
 
 **Window → Package Manager → + → Add package from git URL…**
