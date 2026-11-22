@@ -1,6 +1,6 @@
 {
   "name": "com.balu.unity-liquid-glass",
-  "version": "2.1.0",
+  "version": "2.2.0-rc.1",
   "displayName": "Unity Liquid Glass UI",
   "description": "A cross-platform uGUI and TextMeshPro Liquid Glass toolkit with editor factories, glass presets and Built-in RP/URP backdrop blur support.",
   "unity": "2022.3",
@@ -8,5 +8,11 @@
     "com.unity.ugui": "1.0.0",
     "com.unity.textmeshpro": "3.0.6"
   },
+  "files": [
+    "Editor", "Editor.meta",
+    "Runtime", "Runtime.meta",
+    "Screenshots", "Screenshots.meta",
+    "CHANGELOG.md", "RELEASE_CHECKLIST.md"
+  ],
   "author": { "name": "BalamuraleekrishnaCM" }
 }

@@ -1,0 +1,29 @@
+name: Package validation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  upm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate source and packed package
+        shell: bash
+        run: |
+          python3 Tools/validate_package.py
+          output="$RUNNER_TEMP/liquid-glass-package"
+          mkdir -p "$output/verify"
+          npm pack --ignore-scripts --pack-destination "$output"
+          tar -xzf "$output"/*.tgz -C "$output/verify"
+          python3 Tools/validate_package.py "$output/verify/package"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: liquid-glass-upm
+          path: ${{ runner.temp }}/liquid-glass-package/*.tgz
+          if-no-files-found: error

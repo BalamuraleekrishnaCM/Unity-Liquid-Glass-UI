@@ -39,13 +39,13 @@ namespace Balu.LiquidGlass.URP
             pass = new LiquidGlassBlurPass(settings);
         }
 
+#if !LIQUIDGLASS_URP17
         public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
         {
-#if !LIQUIDGLASS_URP17
-            if (pass != null)
+            if (pass != null && settings.blurShader && renderingData.cameraData.cameraType != CameraType.Preview)
                 pass.Setup(renderer.cameraColorTargetHandle, renderingData.cameraData.cameraTargetDescriptor);
-#endif
         }
+#endif
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
@@ -64,11 +64,13 @@ namespace Balu.LiquidGlass.URP
         private sealed class LiquidGlassBlurPass : ScriptableRenderPass
         {
             private readonly FeatureSettings settings;
+            private Material material;
+#if !LIQUIDGLASS_URP17
             private RTHandle source;
             private RTHandle blurA;
             private RTHandle blurB;
-            private Material material;
             private Vector4 textureSize;
+#endif
             private static readonly int TexelSizeId = Shader.PropertyToID("_LiquidGlassBackground_TexelSize");
             private static readonly int AvailableId = Shader.PropertyToID("_LiquidGlassBackgroundAvailable");
             private static readonly int TextureId = Shader.PropertyToID("_LiquidGlassBackground");
@@ -83,6 +85,7 @@ namespace Balu.LiquidGlass.URP
                 if (settings.blurShader) material = CoreUtils.CreateEngineMaterial(settings.blurShader);
             }
 
+#if !LIQUIDGLASS_URP17
             public void Setup(RTHandle source, RenderTextureDescriptor descriptor)
             {
                 this.source = source;
@@ -109,8 +112,7 @@ namespace Balu.LiquidGlass.URP
                 CommandBufferPool.Release(cmd);
             }
 
-
-#if LIQUIDGLASS_URP17
+#else
             private sealed class GlobalTexturePassData
             {
                 public Vector4 texelSize;
@@ -152,6 +154,7 @@ namespace Balu.LiquidGlass.URP
                         descriptor.width, descriptor.height);
                     builder.UseTexture(blurTextureB, AccessFlags.Read);
                     builder.SetGlobalTextureAfterPass(blurTextureB, TextureId);
+                    builder.AllowPassCulling(false);
                     builder.AllowGlobalStateModification(true);
                     builder.SetRenderFunc((GlobalTexturePassData data, RasterGraphContext context) =>
                     {
@@ -164,10 +167,13 @@ namespace Balu.LiquidGlass.URP
 
             public void Dispose()
             {
+#if !LIQUIDGLASS_URP17
                 blurA?.Release();
                 blurB?.Release();
                 blurA = null;
                 blurB = null;
+                source = null;
+#endif
                 CoreUtils.Destroy(material);
                 material = null;
             }

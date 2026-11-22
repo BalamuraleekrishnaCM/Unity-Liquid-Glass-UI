@@ -1,7 +1,16 @@
 # Unity Liquid Glass UI — Release acceptance checklist
 
-Target: v2.2.0 (candidate only; do not tag until gates pass)
+Target: v2.2.0. Candidate package version: 2.2.0-rc.1.
 Base: Unity 2022.3 LTS, Unity 6 LTS
+
+## Checks completed
+
+- [x] Validate package metadata, local assembly references, asset GUID uniqueness, and bundled material shader GUIDs in source and packed archive.
+- [x] Review the MIT license and update the changelog.
+- [x] Document installation, input setup, and troubleshooting.
+- [x] Add desktop and world-space scene generators with optional XR Interaction Toolkit wiring.
+
+Run the static checks with `python3 Tools/validate_package.py`. GitHub Actions runs them on both source and the generated UPM tarball. The remaining gates require Unity Editor, player, hardware, or publishing evidence.
 
 ## Package integrity
 - [ ] package.json dependencies resolve from a clean project
@@ -27,7 +36,7 @@ Base: Unity 2022.3 LTS, Unity 6 LTS
 - [ ] Profiling and quality presets for mobile and desktop
 
 ## XR
-- [ ] World-space Canvas sample with XR Interaction Toolkit input
+- [ ] World-space sample works with the configured XR Origin and XR Interaction Toolkit input
 - [ ] Quest 3 single-pass instanced stereo correctness
 - [ ] Controller rays and hand/poke interaction
 - [ ] World-space readable text, stable blur and comfortable UI depth
@@ -35,10 +44,8 @@ Base: Unity 2022.3 LTS, Unity 6 LTS
 
 ## Documentation and release
 - [ ] Screenshot captures from real running Unity scene (concept art clearly marked)
-- [ ] Setup and troubleshooting documentation
-- [ ] Automated package validation CI passes
+- [ ] GitHub Actions package validation passes for the candidate commit
 - [ ] Clean Unity sample project opens and plays
-- [ ] Changelog and license reviewed
 - [ ] Create GitHub tag v2.2.0 and attach UPM package archive
 - [ ] Publish release notes with tested Unity/URP/XR versions
 

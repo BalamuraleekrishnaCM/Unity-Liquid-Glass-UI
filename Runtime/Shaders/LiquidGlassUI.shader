@@ -107,12 +107,17 @@ Shader "Balu/LiquidGlass/UI"
                 float2 sampleUV = saturate(screenUV + warp);
 
                 float2 blurStep = _LiquidGlassBackground_TexelSize.xy * max(_BlurRadius, 0.0);
-                fixed3 backdrop = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV).rgb * 0.40;
-                backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV + float2(blurStep.x, 0)).rgb * 0.15;
-                backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV - float2(blurStep.x, 0)).rgb * 0.15;
-                backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV + float2(0, blurStep.y)).rgb * 0.15;
-                backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV - float2(0, blurStep.y)).rgb * 0.15;
-                fixed3 glass = lerp(_GlassTint.rgb, backdrop, saturate(_LiquidGlassBackgroundAvailable * _GlassIntensity));
+                fixed3 glass = _GlassTint.rgb;
+                UNITY_BRANCH
+                if (_LiquidGlassBackgroundAvailable > 0.5 && _GlassIntensity > 0.0)
+                {
+                    fixed3 backdrop = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV).rgb * 0.40;
+                    backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV + float2(blurStep.x, 0)).rgb * 0.15;
+                    backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV - float2(blurStep.x, 0)).rgb * 0.15;
+                    backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV + float2(0, blurStep.y)).rgb * 0.15;
+                    backdrop += UNITY_SAMPLE_SCREENSPACE_TEXTURE(_LiquidGlassBackground, sampleUV - float2(0, blurStep.y)).rgb * 0.15;
+                    glass = lerp(_GlassTint.rgb, backdrop, _GlassIntensity);
+                }
                 glass = lerp(glass, _GlassTint.rgb, _Frost * 0.45);
 
                 float edge = min(min(localUV.x, 1.0 - localUV.x), min(localUV.y, 1.0 - localUV.y));
