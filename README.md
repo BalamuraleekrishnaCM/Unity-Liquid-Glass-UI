@@ -21,7 +21,7 @@ In Unity 2022.3 LTS or Unity 6, import this package and its TextMeshPro dependen
 
 **Tools → Liquid Glass → Create Sample Scene**
 
-The command asks before discarding scene changes, creates and saves `Assets/LiquidGlassShowcase.unity`, and selects the showcase Canvas. Open the scene and press **Play**.
+The command prompts to save modified scenes, creates `Assets/LiquidGlassShowcase.unity` and a companion backdrop material asset, and selects the showcase Canvas. Running it again generates a new scene path. Open the scene and press **Play**.
 
 The generated showcase contains a colorful camera backdrop, frosted glass panels, a responsive button with pointer feedback, three sliders for blur/frost/refraction, a rim-light toggle, an Arctic/Rose/Mint tint dropdown, a name input, and a status readout. The scene uses uGUI and TMP. The generated controls modify the glass material in real time.
 
@@ -29,10 +29,10 @@ The generated showcase contains a colorful camera backdrop, frosted glass panels
 - Import **Window → TextMeshPro → Import TMP Essential Resources** if text is missing.
 - **Built-in RP:** the generator adds `GlassBackgroundCapture` to the camera automatically.
 - **URP:** add **Liquid Glass Renderer Feature** to your active Universal Renderer Data. The generator cannot safely modify your project's URP renderer asset automatically.
-- **XR:** this demo is a screen-space desktop interaction showcase, not a preconfigured headset scene. To test XR, create a World Space Canvas and configure the tracked-device raycaster and XR UI input module.
-- **Validation:** source is committed, but compilation, UI layout, actual blur output, and device behavior have not been verified in a running Unity Editor.
+- **XR:** use **Tools → Liquid Glass → Create World Space Sample Scene** to generate the world-space variant. If XR Interaction Toolkit is installed, the generator adds a Tracked Device Graphic Raycaster and an XR UI Input Module. Add your XR Origin and ray or poke interactors, assign the XR camera as the Canvas Event Camera, and replace the preview camera. Use URP for live world-space blur.
+- **Input:** the desktop generator picks an input module based on the project's active input handling. If you bring the demo into an existing scene, use the scene's EventSystem and its configured module.
 
-The builder is in `Editor/LiquidGlassShowcaseBuilder.cs`; the runtime controller is in `Runtime/Samples/LiquidGlassShowcase.cs`. You can regenerate the sample using the same menu command, which overwrites the generated scene at `Assets/LiquidGlassShowcase.unity` after the scene-save prompt.
+The builder is in `Editor/LiquidGlassShowcaseBuilder.cs`; the runtime controller is in `Runtime/Samples/LiquidGlassShowcase.cs`.
 
 ## Install from Git
 
@@ -69,7 +69,7 @@ Generated objects use native uGUI/TMP components and preserve Unity's standard i
 
 **Unity 2022.3 / URP 14:** the package uses the compatibility ScriptableRenderPass path. Add the feature to the active Universal Renderer Data asset and ensure the renderer uses an intermediate color target when required.
 
-**Unity 6 / URP 17+:** the package uses the native RenderGraph path by default; no Compatibility Mode switch is required. The pass derives its temporary texture descriptors from the active camera color texture and publishes the blurred texture as a global shader input.
+**Unity 6 / URP 17+:** use the native RenderGraph path. If your Unity version exposes **Compatibility Mode (Render Graph Disabled)**, leave it off. The pass derives its temporary texture descriptors from the active camera color texture and publishes the blurred texture as a global shader input.
 
 For either version:
 1. Open the active Universal Renderer Data asset.
@@ -114,6 +114,15 @@ Add **Glass Pointer Feedback** to a control to animate its glass intensity on po
 
 The shader provides a blurred backdrop sample, glass tint, frost, rim highlight, subtle screen-space refraction, rounded-rectangle clipping and soft edge controls. It is a stylized real-time UI effect, not a physically based optical simulation. Blur is captured once per camera frame and shared by glass surfaces; per-surface blur radius adds a small local sample blur.
 
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Glass shows tint without blur | Add the capture component to the camera in Built-in RP or the renderer feature to the *active* renderer data in URP. For Built-in RP, use a screen-space overlay canvas. |
+| Text is missing | Import TMP Essential Resources before generating the scene. |
+| Controls do not receive input | Check that the scene has one active EventSystem with the input module and action mappings for your project. For XR, enable UI interaction on the interactor and check the tracked-device raycaster. |
+| Blur is expensive on the target GPU | Try a 0.25 resolution scale on the capture component or renderer feature, then profile the target device. |
+
 ## Validation status
 
-Source files are published, but this package has not been compiled or run inside Unity as part of this release. Before production use, validate clean imports and compilation in Unity 2022.3 LTS and Unity 6, verify every control's runtime interaction, and profile Built-in RP/URP on target mobile, desktop and XR devices.
+The GitHub workflow checks package metadata, GUIDs, assembly references, and archive contents. Unity import, Play Mode, rendering, and device verification are tracked in the [release checklist](RELEASE_CHECKLIST.md).

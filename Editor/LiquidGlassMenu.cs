@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 using Balu.LiquidGlass;
 
@@ -9,6 +10,8 @@ namespace Balu.LiquidGlass.Editor
     public static class LiquidGlassMenu
     {
         private const string Root = "GameObject/UI/Liquid Glass/";
+        private const string XrUiNamespace = "UnityEngine.XR.Interaction.Toolkit.UI.";
+        private const string XrAssembly = ", Unity.XR.Interaction.Toolkit";
 
         [MenuItem(Root + "Glass Canvas", false, 10)]
         private static void CreateCanvas(MenuCommand cmd)
@@ -35,8 +38,9 @@ namespace Balu.LiquidGlass.Editor
             rect.sizeDelta = new Vector2(1200, 800);
             rect.localScale = Vector3.one * 0.001f;
             go.GetComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+            AddTrackedRaycaster(go);
             Place(go, cmd);
-            EnsureEventSystem();
+            EnsureEventSystem(true);
         }
 
         [MenuItem(Root + "Panel", false, 20)]
@@ -219,14 +223,6 @@ namespace Balu.LiquidGlass.Editor
             viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
 
             var content = CreateRect("Content", viewport);
-            var layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
-            layout.childControlWidth = true;
-            layout.childControlHeight = false;
-            layout.childForceExpandWidth = true;
-            layout.childForceExpandHeight = false;
-            layout.spacing = 2f;
-            var fitter = content.gameObject.AddComponent<ContentSizeFitter>();
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             content.anchorMin = new Vector2(0, 1);
             content.anchorMax = Vector2.one;
             content.pivot = new Vector2(0.5f, 1);
@@ -238,8 +234,6 @@ namespace Balu.LiquidGlass.Editor
             item.pivot = new Vector2(0.5f, 1);
             item.sizeDelta = new Vector2(0, 36);
             var itemBg = AddImage(item, "Item Background", new Color(0.4f, 0.7f, 0.95f, 0.18f));
-            var itemLayout = item.gameObject.AddComponent<LayoutElement>();
-            itemLayout.preferredHeight = 36f;
             var itemToggle = item.gameObject.AddComponent<Toggle>();
             itemToggle.targetGraphic = itemBg;
             itemToggle.transition = Selectable.Transition.ColorTint;
@@ -415,12 +409,35 @@ namespace Balu.LiquidGlass.Editor
             return c;
         }
 
-        private static void EnsureEventSystem()
+        internal static void AddTrackedRaycaster(GameObject canvas)
         {
-            if (Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>()) return;
-            var es = new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem),
-                typeof(UnityEngine.EventSystems.StandaloneInputModule));
-            Undo.RegisterCreatedObjectUndo(es, "Create EventSystem");
+            var raycaster = System.Type.GetType(XrUiNamespace + "TrackedDeviceGraphicRaycaster" + XrAssembly);
+            if (raycaster != null)
+                canvas.AddComponent(raycaster);
+        }
+
+        internal static void EnsureEventSystem(bool preferXr = false)
+        {
+            if (Object.FindObjectOfType<EventSystem>()) return;
+            var eventSystem = new GameObject("EventSystem", typeof(EventSystem));
+            var inputModule = preferXr
+                ? System.Type.GetType(XrUiNamespace + "XRUIInputModule" + XrAssembly)
+                : null;
+            if (inputModule == null)
+            {
+#if ENABLE_INPUT_SYSTEM
+                inputModule = System.Type.GetType(
+                    "UnityEngine.InputSystem.UI.InputSystemUIInputModule, Unity.InputSystem");
+#else
+                inputModule = typeof(StandaloneInputModule);
+#endif
+            }
+
+            if (inputModule != null)
+                eventSystem.AddComponent(inputModule);
+            else
+                Debug.LogWarning("Add a compatible UI input module to the Liquid Glass EventSystem.", eventSystem);
+            Undo.RegisterCreatedObjectUndo(eventSystem, "Create EventSystem");
         }
     }
 }

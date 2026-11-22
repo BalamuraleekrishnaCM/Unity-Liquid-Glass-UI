@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.0-rc.1
+- Added desktop and world-space showcase scene generators with persistent backdrop materials.
+- Used the active UI input system when generating EventSystems and added optional XR Interaction Toolkit wiring for world-space canvases.
+- Fixed generated slider and dropdown layout so the controls can manage their own fill and item positioning.
+- Isolated the URP 14 compatibility path from the URP 17+ RenderGraph path and skipped backdrop sampling when unavailable.
+- Added Unity asset metadata and automated source and UPM archive integrity checks.
+
 ## 2.1.0
 - Added a uGUI glass shader with backdrop sampling, tint, frost, rim lighting, screen-space refraction and rounded corners.
 - Added separable Gaussian blur shaders for Built-in RP and URP.

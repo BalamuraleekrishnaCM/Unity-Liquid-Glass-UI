@@ -3,6 +3,7 @@ Shader "Hidden/Balu/LiquidGlass/URPGaussianBlur"
     Properties { _BlurRadius ("Blur Radius", Float) = 3 }
     SubShader
     {
+        PackageRequirements { "com.unity.render-pipelines.universal" }
         Tags { "RenderPipeline"="UniversalPipeline" }
         ZWrite Off ZTest Always Cull Off
         HLSLINCLUDE
